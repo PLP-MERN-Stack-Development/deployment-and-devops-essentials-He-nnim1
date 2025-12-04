@@ -1,77 +1,187 @@
-# Deployment and DevOps for MERN Applications
+# MERN Stack Blog – Week 4 Integration Project
 
-This assignment focuses on deploying a full MERN stack application to production, implementing CI/CD pipelines, and setting up monitoring for your application.
+Build a production-ready full-stack MERN application that showcases end-to-end integration between a MongoDB/Express.js API and a Vite + React client.  
+This implementation provides a complete blogging platform including authentication, file uploads, pagination, search, and commenting.
 
-## Assignment Overview
+---
 
-You will:
-1. Prepare your MERN application for production deployment
-2. Deploy the backend to a cloud platform
-3. Deploy the frontend to a static hosting service
-4. Set up CI/CD pipelines with GitHub Actions
-5. Implement monitoring and maintenance strategies
+## 🌟 Features Completed
 
-## Getting Started
+- Full CRUD REST API for blog posts and categories with Express 5 + Mongoose
+- JWT-based authentication (register, login, session refresh, protected routes, role checks)
+- React Router 7 single-page app with reusable layout, routes, and protected routes
+- Context-based state management (`AuthContext`, `PostsContext`) and custom hooks
+- Image uploads via Multer with automatic file serving from `/uploads`
+- Client-side forms with validation, optimistic UI updates, and API error handling
+- Pagination, category filtering, text search, tags, and view counter
+- Comment system with authenticated posting
+- Centralized error handling, request validation (express-validator), and async wrappers
 
-1. Accept the GitHub Classroom assignment invitation
-2. Clone your personal repository that was created by GitHub Classroom
-3. Follow the setup instructions in the `Week7-Assignment.md` file
-4. Use the provided templates and configuration files as a starting point
+---
 
-## Files Included
+## 🗂️ Project Structure
 
-- `Week7-Assignment.md`: Detailed assignment instructions
-- `.github/workflows/`: GitHub Actions workflow templates
-- `deployment/`: Deployment configuration files and scripts
-- `.env.example`: Example environment variable templates
-- `monitoring/`: Monitoring configuration examples
+```
+mern-stack-integration/
+├── client/                         # Vite + React front-end
+│   ├── env.example                 # Sample environment variables
+│   ├── src/
+│   │   ├── components/             # UI components (Navbar, PostCard, forms…)
+│   │   ├── context/                # AuthContext & PostsContext providers
+│   │   ├── hooks/                  # Custom hooks wrapping the contexts
+│   │   ├── pages/                  # Route-aligned page components
+│   │   ├── services/               # Axios API layer with interceptors
+│   │   ├── App.jsx                 # Route definitions
+│   │   └── main.jsx                # App bootstrap with providers
+│   └── package.json
+├── server/                         # Express + MongoDB back-end
+│   ├── env.example                 # Sample environment variables
+│   ├── controllers/                # Route handlers (posts, categories, auth)
+│   ├── middleware/                 # Auth, validation, upload, error handling
+│   ├── models/                     # Mongoose models (Post, Category, User)
+│   ├── routes/                     # API route definitions
+│   ├── utils/                      # AppError helper
+│   ├── package.json
+│   └── server.js                   # App entry point
+├── Week4-Assignment.md             # Task breakdown & completion log
+└── README.md                       # You are here
+```
 
-## Requirements
+---
 
-- A completed MERN stack application from previous weeks
-- Accounts on the following services:
-  - GitHub
-  - MongoDB Atlas
-  - Render, Railway, or Heroku (for backend)
-  - Vercel, Netlify, or GitHub Pages (for frontend)
-- Basic understanding of CI/CD concepts
+## ⚙️ Prerequisites
 
-## Deployment Platforms
+- Node.js 18+
+- npm 10+
+- MongoDB (local instance or Atlas cluster)
+- Optional: Cloudinary/S3 bucket if you plan to offload image uploads later
 
-### Backend Deployment Options
-- **Render**: Easy to use, free tier available
-- **Railway**: Developer-friendly, generous free tier
-- **Heroku**: Well-established, extensive documentation
+---
 
-### Frontend Deployment Options
-- **Vercel**: Optimized for React apps, easy integration
-- **Netlify**: Great for static sites, good CI/CD
-- **GitHub Pages**: Free, integrated with GitHub
+## ⚡ Quick Start
 
-## CI/CD Pipeline
+### 1. Clone & install dependencies
 
-The assignment includes templates for setting up GitHub Actions workflows:
-- `frontend-ci.yml`: Tests and builds the React application
-- `backend-ci.yml`: Tests the Express.js backend
-- `frontend-cd.yml`: Deploys the frontend to your chosen platform
-- `backend-cd.yml`: Deploys the backend to your chosen platform
+```bash
+git clone <your-repo-url>
+cd mern-stack-integration
 
-## Submission
+# Back-end
+cd server
+npm install
 
-Your work will be automatically submitted when you push to your GitHub Classroom repository. Make sure to:
+# Front-end
+cd ../client
+npm install
+```
 
-1. Complete all deployment tasks
-2. Set up CI/CD pipelines with GitHub Actions
-3. Deploy both frontend and backend to production
-4. Document your deployment process in the README.md
-5. Include screenshots of your CI/CD pipeline in action
-6. Add URLs to your deployed applications
+### 2. Configure environment variables
 
-## Resources
+Copy the provided sample files and update the values for your setup:
 
-- [GitHub Actions Documentation](https://docs.github.com/en/actions)
-- [MongoDB Atlas Documentation](https://docs.atlas.mongodb.com/)
-- [Render Documentation](https://render.com/docs)
-- [Railway Documentation](https://docs.railway.app/)
-- [Vercel Documentation](https://vercel.com/docs)
-- [Netlify Documentation](https://docs.netlify.com/) 
+```bash
+# Back-end (.env lives beside server.js)
+cd server
+copy env.example .env  # Windows
+# cp env.example .env   # macOS/Linux
+
+# Front-end (root of client workspace)
+cd ../client
+copy env.example .env  # Windows
+# cp env.example .env   # macOS/Linux
+```
+
+**Server `.env` fields**
+
+- `PORT` – API port (default `5000`)
+- `MONGODB_URI` – MongoDB connection string
+- `JWT_SECRET` – strong secret for signing tokens
+- `JWT_EXPIRES_IN` – token lifetime (e.g. `7d`)
+- `CLIENT_URL` – URL of the React app (for CORS)
+
+**Client `.env` fields**
+
+- `VITE_API_URL` – Base URL pointing to the Express API (e.g. `http://localhost:5000/api`)
+
+### 3. Run the dev servers
+
+```bash
+# API
+cd server
+npm run dev
+
+# Client
+cd ../client
+npm run dev
+```
+
+Visit the React app at the URL reported by Vite (normally `http://localhost:5173`).
+
+---
+
+## 🔌 API Overview
+
+| Method | Endpoint                     | Description                                | Auth |
+|--------|-----------------------------|--------------------------------------------|------|
+| GET    | `/api/posts`                | List posts (supports `page`, `limit`, `category`, `search`, `author`) | Public |
+| GET    | `/api/posts/:idOrSlug`      | Read a single post, increments view count  | Public |
+| POST   | `/api/posts`                | Create a post (supports image upload)      | JWT  |
+| PUT    | `/api/posts/:id`            | Update a post                              | JWT  |
+| DELETE | `/api/posts/:id`            | Delete a post                              | JWT  |
+| POST   | `/api/posts/:id/comments`   | Add a comment                              | JWT  |
+| GET    | `/api/categories`           | List categories                            | Public |
+| POST   | `/api/categories`           | Create a category (admin only)             | JWT + Admin |
+| POST   | `/api/auth/register`        | Register new user                          | Public |
+| POST   | `/api/auth/login`           | Login and receive JWT                      | Public |
+| GET    | `/api/auth/me`              | Resolve the current session                | JWT  |
+
+All responses follow this structure:
+
+```json
+{
+  "success": true,
+  "data": { /* resource */ },
+  "pagination": { /* optional paging meta */ }
+}
+```
+
+Validation errors respond with `400` and a descriptive `message`.
+
+---
+
+## 🖥️ Front-End Experience
+
+- **Home**: hero, search, category filter, paginated posts grid.
+- **Post details**: featured image, rich body, tags, view count, and comments.
+- **Auth flows**: register/login forms with inline validation feedback.
+- **Author dashboard**: manage authored posts with edit/delete controls.
+- **Create/Edit forms**: upload featured images, toggle publish status, manage tags.
+- **Global UX**: optimistic updates, skeleton loaders, toasts-style alerts, and redirect on auth failures.
+
+State is managed via context providers and custom hooks (`useAuth`, `usePosts`), keeping components declarative and testable.
+
+## Screenshots
+### Home page before login
+![HomePageBeforeLogin](./images/Screenshot1.png)
+![HomePageBeforeLogin](./images/Screenshot2.png)
+
+### Login page
+![Login](./images/Screenshot3.png)
+
+### Home page after login
+![HomePageAfterLogin](./images/Screenshot4.png)
+![HomePageAfterLogin](./images/Screenshot5.png)
+
+### Create a new post page
+![NewPost](./images/Screenshot6.png)
+![NewPost](./images/Screenshot7.png)
+
+### Dashboard page
+![Dashboard](./images/Screenshot8.png)
+
+
+
+
+
+
+
