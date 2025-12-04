@@ -1,4 +1,4 @@
-# MERN Stack Blog – Week 4 Integration Project
+# MERN Stack Blog – Week 7 Integration Project
 
 Build a production-ready full-stack MERN application that showcases end-to-end integration between a MongoDB/Express.js API and a Vite + React client.  
 This implementation provides a complete blogging platform including authentication, file uploads, pagination, search, and commenting.
