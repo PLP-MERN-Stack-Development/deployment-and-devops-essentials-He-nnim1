@@ -4,6 +4,11 @@ Build a production-ready full-stack MERN application that showcases end-to-end i
 This implementation provides a complete blogging platform including authentication, file uploads, pagination, search, and commenting.
 
 ---
+## Deployed App Links
+
+🔗 **URL of the deployed frontend application** [Click here to visit](https://deployment-frontend-phi.vercel.app/)
+🔗 **URL of the deployed backend API** [Click here to visit](https://deployment-and-devops-essentials-backend.onrender.com)
+
 
 ## 🌟 Features Completed
 
